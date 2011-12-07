@@ -1,0 +1,5 @@
+C:\Users\pandarun\documents\visual studio 2010\Projects\FunWithMemoryMappedFiles\FunWithMemoryMappedFiles\bin\Release\FunWithMemoryMappedFiles.exe
+C:\Users\pandarun\documents\visual studio 2010\Projects\FunWithMemoryMappedFiles\FunWithMemoryMappedFiles\bin\Release\FunWithMemoryMappedFiles.pdb
+C:\Users\pandarun\documents\visual studio 2010\Projects\FunWithMemoryMappedFiles\FunWithMemoryMappedFiles\obj\x86\Release\ResolveAssemblyReference.cache
+C:\Users\pandarun\documents\visual studio 2010\Projects\FunWithMemoryMappedFiles\FunWithMemoryMappedFiles\obj\x86\Release\FunWithMemoryMappedFiles.exe
+C:\Users\pandarun\documents\visual studio 2010\Projects\FunWithMemoryMappedFiles\FunWithMemoryMappedFiles\obj\x86\Release\FunWithMemoryMappedFiles.pdb
