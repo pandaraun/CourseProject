@@ -37,7 +37,7 @@ namespace FunWithMemoryMappedFiles
             Console.WriteLine("sparsity : {0} ", (float)Dict.NoneZeros * 100 / (Dict.Words.Count * Dict.Lemms.Count));
             Console.WriteLine("total words: {0}, total terms: {1}", Dict.Words.Count, Dict.Lemms.Count);
 
-
+            //добавлен комментарий
             CSRMatrix conceptsMtrx = Dict.getCSRConceptsMatrix(conceptsfile);
 
             Console.WriteLine("nonezeros : {0}", conceptsMtrx.Values.Count());
