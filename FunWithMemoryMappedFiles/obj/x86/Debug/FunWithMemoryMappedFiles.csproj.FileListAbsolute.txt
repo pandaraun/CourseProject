@@ -3,3 +3,8 @@ C:\Users\pandarun\documents\visual studio 2010\Projects\FunWithMemoryMappedFiles
 C:\Users\pandarun\documents\visual studio 2010\Projects\FunWithMemoryMappedFiles\FunWithMemoryMappedFiles\bin\Debug\FunWithMemoryMappedFiles.pdb
 C:\Users\pandarun\documents\visual studio 2010\Projects\FunWithMemoryMappedFiles\FunWithMemoryMappedFiles\obj\x86\Debug\FunWithMemoryMappedFiles.exe
 C:\Users\pandarun\documents\visual studio 2010\Projects\FunWithMemoryMappedFiles\FunWithMemoryMappedFiles\obj\x86\Debug\FunWithMemoryMappedFiles.pdb
+C:\CourseProject\FunWithMemoryMappedFiles\obj\x86\Debug\FunWithMemoryMappedFiles.exe
+C:\CourseProject\FunWithMemoryMappedFiles\obj\x86\Debug\FunWithMemoryMappedFiles.pdb
+C:\CourseProject\FunWithMemoryMappedFiles\bin\Debug\FunWithMemoryMappedFiles.exe
+C:\CourseProject\FunWithMemoryMappedFiles\bin\Debug\FunWithMemoryMappedFiles.pdb
+C:\CourseProject\FunWithMemoryMappedFiles\obj\x86\Debug\ResolveAssemblyReference.cache

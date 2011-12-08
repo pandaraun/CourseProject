@@ -66,6 +66,7 @@ namespace FunWithMemoryMappedFiles
 
                 if (Cols[last] == i)
                 {
+                    
                     float valueA = Values[i];
                     float valueB = Values[last];
 

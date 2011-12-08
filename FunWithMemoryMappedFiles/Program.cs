@@ -40,9 +40,9 @@ namespace FunWithMemoryMappedFiles
 
             CSRMatrix conceptsMtrx = Dict.getCSRConceptsMatrix(conceptsfile);
 
-            //Console.WriteLine("nonezeros : {0}",conceptsMtrx.Values.Count());
-            //Console.WriteLine("colids : {0}", conceptsMtrx.ColIdArr.Count());
-            //Console.WriteLine("rowptrs : {0}", conceptsMtrx.RowPtr.Count());
+            Console.WriteLine("nonezeros : {0}", conceptsMtrx.Values.Count());
+            Console.WriteLine("colids : {0}", conceptsMtrx.ColIdArr.Count());
+            Console.WriteLine("rowptrs : {0}", conceptsMtrx.RowPtr.Count());
             
 
             //Console.WriteLine(conceptsMtrx);
@@ -58,9 +58,12 @@ namespace FunWithMemoryMappedFiles
             {
                 for (int j = 0; j < _rowptrs.Length - 1; j++)
                 {
+                    
                     if (i >= j) continue;
+                    
                     Cosine.Calculate(ref _values, ref _colids, ref _rowptrs, i, j);
                 }
+                
             }
 
             Clocks.Stop();
