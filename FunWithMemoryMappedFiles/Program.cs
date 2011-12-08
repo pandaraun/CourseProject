@@ -54,17 +54,19 @@ namespace FunWithMemoryMappedFiles
 
 
             var Clocks = Stopwatch.StartNew();
-            for (int i = 0; i < _rowptrs.Length - 1; i++)
+
+            Parallel.For(0, _rowptrs.Length - 1, i =>
             {
                 for (int j = 0; j < _rowptrs.Length - 1; j++)
                 {
-                    
+
                     if (i >= j) continue;
-                    
-                    Distance.CalculateOverlap(ref _values, ref _colids, ref _rowptrs, i, j);
+
+                    Distance.CalculateCosine(ref _values, ref _colids, ref _rowptrs, i, j);
+                    //Distance.CalculateOverlap(ref _values, ref _colids, ref _rowptrs, i, j);
                 }
-                
-            }
+
+            });
 
             Clocks.Stop();
             Console.WriteLine("elapsed : {0} ms", Clocks.ElapsedMilliseconds);

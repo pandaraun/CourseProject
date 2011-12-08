@@ -45,7 +45,7 @@ namespace FunWithMemoryMappedFiles
             for (int i = OffsetShortStart; i < OffsetShortEnd; i++)
             {
                 int first = OffsetLongStart;
-                int last = OffsetShortEnd-1;
+                int last = OffsetLongEnd-1;
 
                 int mid;
                 /* Если просматриваемый участок непустой, first<last */
@@ -53,7 +53,7 @@ namespace FunWithMemoryMappedFiles
                 {
                     mid = first + (last - first) / 2;
 
-                    if (i <= Cols[mid])
+                    if (Cols[i] <= Cols[mid])
                     {
                         last = mid;
                     }
@@ -64,11 +64,11 @@ namespace FunWithMemoryMappedFiles
                 }
 
 
-                if (Cols[last] == i)
+                if (Cols[last] == Cols[i])
                 {
                     
-                    float valueA = Values[i];
-                    float valueB = Values[last];
+                    float valueA = Values[Cols[i]];
+                    float valueB = Values[Cols[last]];
 
                     //накапливаем числитель и суммы квадратов в знаменателе
                     Sum += valueA * valueB;
@@ -113,7 +113,7 @@ namespace FunWithMemoryMappedFiles
             for (int i = OffsetShortStart; i < OffsetShortEnd; i++)
             {
                 int first = OffsetLongStart;
-                int last = OffsetShortEnd - 1;
+                int last = OffsetLongEnd - 1;
 
                 int mid;
                 /* Если просматриваемый участок непустой, first<last */
@@ -121,7 +121,7 @@ namespace FunWithMemoryMappedFiles
                 {
                     mid = first + (last - first) / 2;
 
-                    if (i <= Cols[mid])
+                    if (Cols[i] <= Cols[mid])
                     {
                         last = mid;
                     }
@@ -132,15 +132,15 @@ namespace FunWithMemoryMappedFiles
                 }
 
 
-                if (Cols[last] == i)
-                {
+                if (Cols[last] == Cols[i])
+                {                    
                     overlap++;
                 }
 
 
             }
 
-            return (float)2 * overlap / (Rows[RowAindex + 1] - Rows[RowAindex]) * (Rows[RowBindex + 1] - Rows[RowBindex]);
+            return (float)2 * overlap /( OffsetShortEnd-OffsetShortStart)*(OffsetLongEnd-OffsetLongStart);
         }
     }
 }
