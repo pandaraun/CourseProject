@@ -61,7 +61,7 @@ namespace FunWithMemoryMappedFiles
                     
                     if (i >= j) continue;
                     
-                    Cosine.Calculate(ref _values, ref _colids, ref _rowptrs, i, j);
+                    Distance.CalculateOverlap(ref _values, ref _colids, ref _rowptrs, i, j);
                 }
                 
             }
