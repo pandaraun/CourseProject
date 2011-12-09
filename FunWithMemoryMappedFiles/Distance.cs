@@ -5,9 +5,9 @@ using System.Text;
 
 namespace FunWithMemoryMappedFiles
 {
-    static class Distance
+    partial  class Distance
     {
-
+        #region Cosine
         static public float CalculateCosine(ref float[] Values,ref int[] Cols,ref int[] Rows, int RowAindex, int RowBindex)
         {
             int OffsetShortStart = 0;
@@ -67,8 +67,8 @@ namespace FunWithMemoryMappedFiles
                 if (Cols[last] == Cols[i])
                 {
                     
-                    float valueA = Values[Cols[i]];
-                    float valueB = Values[Cols[last]];
+                    float valueA = Values[i];
+                    float valueB = Values[last];
 
                     //накапливаем числитель и суммы квадратов в знаменателе
                     Sum += valueA * valueB;
@@ -82,6 +82,8 @@ namespace FunWithMemoryMappedFiles
             
             return (float)(Sum / (Math.Sqrt(SumSqrA) * Math.Sqrt(SumSqrB)));
         }
+        #endregion 
+        #region Overlap
         static public float CalculateOverlap(ref float[] Values, ref int[] Cols, ref int[] Rows, int RowAindex, int RowBindex)
         {
             int OffsetShortStart = 0;
@@ -142,5 +144,10 @@ namespace FunWithMemoryMappedFiles
 
             return (float)2 * overlap /( OffsetShortEnd-OffsetShortStart)*(OffsetLongEnd-OffsetLongStart);
         }
+        #endregion
+        #region Karaulov
+        partial void CalculateKaraulov();
+        #endregion
+
     }
 }

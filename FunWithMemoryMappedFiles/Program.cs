@@ -19,7 +19,7 @@ namespace FunWithMemoryMappedFiles
             
 
            //путь к файлу с определениями 
-            string path =@"C:\test\definitions.csv";  
+            string path = @"C:\test\definitions.csv";  
            //путь к файлу со стоп словами
             string stoplistfile = @"C:\test\stoplist.csv";
             //путь  к файлу между которыми необходимо найти семантические отношения
@@ -37,8 +37,9 @@ namespace FunWithMemoryMappedFiles
             Console.WriteLine("sparsity : {0} ", (float)Dict.NoneZeros * 100 / (Dict.Words.Count * Dict.Lemms.Count));
             Console.WriteLine("total words: {0}, total terms: {1}", Dict.Words.Count, Dict.Lemms.Count);
 
-            //добавлен комментарий
-            CSRMatrix conceptsMtrx = Dict.getCSRConceptsMatrix(conceptsfile);
+            
+            CSRMatrix conceptsMtrx = Dict.getCSRConceptsMatrix(conceptsfile,1);
+            //CSRMatrix conceptsMtrx = Dict.getCSRFullConceptsMatrix();
 
             Console.WriteLine("nonezeros : {0}", conceptsMtrx.Values.Count());
             Console.WriteLine("colids : {0}", conceptsMtrx.ColIdArr.Count());
@@ -70,10 +71,17 @@ namespace FunWithMemoryMappedFiles
 
             Clocks.Stop();
             Console.WriteLine("elapsed : {0} ms", Clocks.ElapsedMilliseconds);
-            
-     
 
-            
+
+
+
+            var t = from g in Dict.GetFLemms group g by g.Value into grp orderby grp.Count() select new { cnt = grp.Count(), freq = grp.Key,name = grp.First().Key };
+
+            foreach (var item in t)
+            {
+                Console.WriteLine(" {0} : {1} : first : {2}", item.freq, item.cnt,item.name);
+
+            }
             
             
                 

@@ -20,7 +20,10 @@ namespace FunWithMemoryMappedFiles
         //список слов - документов
         private static List<string> _words;
 
-        //инициализация полей словаря
+        //словарь частот лемм
+        private static Dictionary<string, byte> _fterms;
+
+        
         static Dict()
         {
             _stoplist = new HashSet<string>();
@@ -30,6 +33,8 @@ namespace FunWithMemoryMappedFiles
             _terms = new List<string>();
             //список слов - документов
             _words = new List<string>();
+
+            _fterms = new Dictionary<string, byte>();
         }
 
         #endregion
@@ -39,6 +44,8 @@ namespace FunWithMemoryMappedFiles
         public static List<string> Lemms { get { return _terms; } }
         public static List<string> Words { get { return _words; } }
         public static SortedDictionary<string, SortedDictionary<string, float>> GetDict { get { return _dict; } }
+        public static Dictionary<string, byte> GetFLemms { get { return _fterms; } }
+        
         #endregion        
 
         #region Methods
@@ -50,7 +57,7 @@ namespace FunWithMemoryMappedFiles
         /// <param name="stoplistfile">путь к файлу со стоп-словами</param>
         public static void Create(string dictpath, string stoplistfile)
         {     
-
+            
             try
             {
                 _stoplist = new HashSet<string>(File.ReadLines(stoplistfile));
@@ -63,7 +70,7 @@ namespace FunWithMemoryMappedFiles
             }
 
             //отсекаем только нужные части речи
-            Regex rx = new Regex(@"(VV#|VVN#|VVP#|JJ#|NN#|NNS|#NP)(?<lemma>\w+\b)", RegexOptions.Compiled);
+            Regex rx = new Regex(@"(VV#|VVN#|VVP#|JJ#|NN#|NNS#|NP#)(?<lemma>\w+\b)", RegexOptions.Compiled);
                         
             char[] separator = { ';' };
 
@@ -109,7 +116,18 @@ namespace FunWithMemoryMappedFiles
                             term.Add(lemm, 1);
                             //добавляем в список лемм, если ее там нет еще
 
-                            if (!_terms.Contains(lemm)) _terms.Add(lemm);
+                            if (!_fterms.ContainsKey(lemm))
+                            {
+                                _terms.Add(lemm);
+                                _fterms.Add(lemm, 1);
+                            }
+                            else
+                            {
+                                _fterms[lemm]++;
+                            }
+                            
+                            
+                            
                             //увеличваем число ненулевых элементов на размер ключей в словаре термов текущего слова - документа  
                             _nonezeros++;
                         }
@@ -124,7 +142,15 @@ namespace FunWithMemoryMappedFiles
                 _terms.Sort();
             }
         }
-        public static CSRMatrix getCSRConceptsMatrix(string conceptspath)
+        /// <summary>
+        /// получить матрицу в формате CSR
+        /// для списка концептов, уменьшения размерности 
+        /// используем параметр  наименьшей частоты - lowestfreq
+        /// </summary>
+        /// <param name="conceptspath">путь к файлу концептов</param>
+        /// <param name="lowestfreq">наименьшая частота леммы в дефиниции</param>
+        /// <returns></returns>
+        public static CSRMatrix getCSRConceptsMatrix(string conceptspath,int lowestfreq=2)
         {
             //индексы столбцы матрицы
             List<int> colIds= new List<int>();
@@ -139,26 +165,81 @@ namespace FunWithMemoryMappedFiles
                 string line = string.Empty;
                 //указатель на начала строк
                 int rowPtr = 0;
+                int deflemmcnt = 0;
                 
                 while( (line = conceptreader.ReadLine())!= null)
                 {
                     if (line == "") continue;
                     rowPtrs.Add(rowPtr);
-                    
+
+                    deflemmcnt = 0;
                     foreach(var lemm in GetDict[line].Keys)
                     {                        
+                        //порог частоты
+                        if (_fterms[lemm]<lowestfreq)    continue;
                         //для каждой леммы концепта смотрим индекс в списке лемм словаря
                         colIds.Add(Lemms.IndexOf(lemm));
 
-                        values.Add(GetDict[line][lemm]);                    
-	                }                
+                        values.Add(GetDict[line][lemm]);
 
-                    rowPtr += GetDict[line].Count;                    
+                        deflemmcnt++;
+	                }
+                    //несвязанные ни с кем слова 
+                    if (deflemmcnt == 0)   continue;
+                        
+                    rowPtr += deflemmcnt;
+                    //rowPtr += GetDict[line].Count;                    
                 }
                 rowPtrs.Add(rowPtr);
             }
 
             return new CSRMatrix(rowPtrs.ToArray(),colIds.ToArray(),values.ToArray());        
+        }
+        /// <summary>
+        /// для подсчета всех расстояний(simularities) все слов в словаре строится матрица в формате CSR 
+        /// для уменьшения размерности используем lowestfreq
+        /// </summary>
+        /// <param name="lowestfreq">наименьшая частота</param>
+        /// <returns></returns>
+        public static CSRMatrix getCSRFullConceptsMatrix(int lowestfreq = 2)
+        {
+            //индексы столбцы матрицы
+            List<int> colIds = new List<int>();
+            //номера начал строк 
+            List<int> rowPtrs = new List<int>();
+            //значения
+            List<float> values = new List<float>();
+
+            //заполняем матрицу концептов в CSR
+            
+                
+                //указатель на начала строк
+                int rowPtr = 0;
+
+
+
+                foreach (string concept in GetDict.Keys)
+                {
+                    rowPtrs.Add(rowPtr);
+
+                    foreach (var lemm in GetDict[concept].Keys)
+                    {
+
+                        //if (_fterms[lemm] < lowestfreq) continue;
+                        //для каждой леммы концепта смотрим индекс в списке лемм словаря
+                        colIds.Add(Lemms.IndexOf(lemm));
+
+                        values.Add(GetDict[concept][lemm]);
+                    }
+
+                    rowPtr += GetDict[concept].Count;
+
+
+                } 
+                rowPtrs.Add(rowPtr);
+            
+
+            return new CSRMatrix(rowPtrs.ToArray(), colIds.ToArray(), values.ToArray());
         }
         #endregion
     }
