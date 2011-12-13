@@ -3,69 +3,35 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace FunWithMemoryMappedFiles
+namespace KnnMutualKnn
 {
     class CSRMatrix
     {
         
         #region Private Members
-
-            private int[] _rowPtrArr;
-            private int[] _colIdArr;
-            private float[] _values;
+            
+            public int[] _rowPtrArr;
+            public int[] _colIdArr;
+            public float[] _values;
 
         #endregion
 
         #region Public Members
 
-        public int[] RowPtr
-        {
-            get
-            {
-                return this._rowPtrArr;
-            }
-            set
-            {
-                this._rowPtrArr=value;
-            }
-        }
-        public int[] ColIdArr
-        {
-            get
-            {
-                return this._colIdArr;
-            }
-            set
-            {
-                this._colIdArr=value;
-            }
-        }
-        public float[] Values
-        {
-            get             
-            {
-                return this._values;
-            }
-            set
-            {
-                this._values = value;
-            }
-        
-        }
 
         public CSRMatrix()
         {             
         }
         public CSRMatrix(int[] rowPtr, int[] colIdArr, float[] values)
         {
-            RowPtr = rowPtr;
-            ColIdArr = colIdArr;
-            Values = values;        
+            this._rowPtrArr = rowPtr;
+            this._colIdArr = colIdArr;
+            this._values = values;        
         }
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder("Values : [ ");
-            foreach (float value in Values)
+            foreach (float value in this._values)
             {
                 sb.AppendFormat(" {0} ",value);
             }
@@ -73,7 +39,7 @@ namespace FunWithMemoryMappedFiles
             sb.AppendFormat("]\n");
             sb.Append("Columns : [");
 
-            foreach(int colid in ColIdArr)
+            foreach(int colid in this._colIdArr)
             {
                 sb.AppendFormat(" {0} ", colid);
             }
@@ -81,7 +47,7 @@ namespace FunWithMemoryMappedFiles
             sb.AppendFormat("]\n");
             sb.Append("RowPtr : [");
 
-            foreach (int rowPtr in RowPtr)
+            foreach (int rowPtr in this._rowPtrArr)
             {
                 sb.AppendFormat(" {0} ", rowPtr);
             }

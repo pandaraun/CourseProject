@@ -4,8 +4,10 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using System.Diagnostics;
 
-namespace FunWithMemoryMappedFiles
+namespace KnnMutualKnn
 {
     static class Dict
     {
@@ -13,15 +15,15 @@ namespace FunWithMemoryMappedFiles
         #region Private Members
 
         private static HashSet<string> _stoplist;
-        private static SortedDictionary<string, SortedDictionary<string, float>> _dict;
+        public static SortedDictionary<string, SortedDictionary<string, float>> _dict;
         private static int _nonezeros;
         //список термов
-        private static List<string> _terms;
+        public static List<string> _terms;
         //список слов - документов
         private static List<string> _words;
 
         //словарь частот лемм
-        private static Dictionary<string, byte> _fterms;
+        public static SortedDictionary<string, byte> _fterms;
 
         
         static Dict()
@@ -34,7 +36,7 @@ namespace FunWithMemoryMappedFiles
             //список слов - документов
             _words = new List<string>();
 
-            _fterms = new Dictionary<string, byte>();
+            _fterms = new SortedDictionary<string, byte>();
         }
 
         #endregion
@@ -44,7 +46,7 @@ namespace FunWithMemoryMappedFiles
         public static List<string> Lemms { get { return _terms; } }
         public static List<string> Words { get { return _words; } }
         public static SortedDictionary<string, SortedDictionary<string, float>> GetDict { get { return _dict; } }
-        public static Dictionary<string, byte> GetFLemms { get { return _fterms; } }
+        public static SortedDictionary<string, byte> GetFLemms { get { return _fterms; } }
         
         #endregion        
 
@@ -89,7 +91,11 @@ namespace FunWithMemoryMappedFiles
                     string[] result = line.Split(separator);
 
                     //для слов с несколькими определениями берем первое, остальные пропускаем//
-                    if (_dict.ContainsKey(result[0])) { Console.WriteLine(result[0]); continue; }
+                    if (_dict.ContainsKey(result[0])) 
+                    {
+                     //   Console.WriteLine(result[0]); 
+                        continue; 
+                    }
 
 
 
@@ -124,8 +130,7 @@ namespace FunWithMemoryMappedFiles
                             else
                             {
                                 _fterms[lemm]++;
-                            }
-                            
+                            }                          
                             
                             
                             //увеличваем число ненулевых элементов на размер ключей в словаре термов текущего слова - документа  
@@ -145,12 +150,12 @@ namespace FunWithMemoryMappedFiles
         /// <summary>
         /// получить матрицу в формате CSR
         /// для списка концептов, уменьшения размерности 
-        /// используем параметр  наименьшей частоты - lowestfreq
+        /// используем параметр  наименьшей частоты - lowestfreq и первые k лемм
         /// </summary>
         /// <param name="conceptspath">путь к файлу концептов</param>
         /// <param name="lowestfreq">наименьшая частота леммы в дефиниции</param>
         /// <returns></returns>
-        public static CSRMatrix getCSRConceptsMatrix(string conceptspath,int lowestfreq=2)
+        public static CSRMatrix getCSRConceptsMatrix(string conceptspath,int topklemms=5000,int lowestfreq=2)
         {
             //индексы столбцы матрицы
             List<int> colIds= new List<int>();
@@ -159,6 +164,10 @@ namespace FunWithMemoryMappedFiles
             //значения
             List<float> values= new List<float>();
 
+
+
+
+
             //заполняем матрицу концептов в CSR
             using(StreamReader conceptreader = new StreamReader(conceptspath))
             {
@@ -166,17 +175,23 @@ namespace FunWithMemoryMappedFiles
                 //указатель на начала строк
                 int rowPtr = 0;
                 int deflemmcnt = 0;
-                
+
+                var top5kfrequentlemms = _fterms.OrderByDescending(i => i.Value).Take(topklemms).Select(i =>  i.Key).ToArray();
+                HashSet<string> topkfrequenthash = new HashSet<string>(top5kfrequentlemms);              
+
+
                 while( (line = conceptreader.ReadLine())!= null)
                 {
                     if (line == "") continue;
                     rowPtrs.Add(rowPtr);
 
-                    deflemmcnt = 0;
+                    deflemmcnt = 0;                    
                     foreach(var lemm in GetDict[line].Keys)
                     {                        
                         //порог частоты
                         if (_fterms[lemm]<lowestfreq)    continue;
+                        //порог порядка
+                        if (!topkfrequenthash.Contains(lemm)) continue;
                         //для каждой леммы концепта смотрим индекс в списке лемм словаря
                         colIds.Add(Lemms.IndexOf(lemm));
 
@@ -196,13 +211,13 @@ namespace FunWithMemoryMappedFiles
             return new CSRMatrix(rowPtrs.ToArray(),colIds.ToArray(),values.ToArray());        
         }
         /// <summary>
-        /// для подсчета всех расстояний(simularities) все слов в словаре строится матрица в формате CSR 
-        /// для уменьшения размерности используем lowestfreq
+        /// для подсчета всех расстояний(simularities) всех слов в словаре строится матрица в формате CSR 
+        /// для уменьшения размерности используем lowestfreq и первые k лемм
         /// </summary>
         /// <param name="lowestfreq">наименьшая частота</param>
         /// <returns></returns>
-        public static CSRMatrix getCSRFullConceptsMatrix(int lowestfreq = 2)
-        {
+        public static CSRMatrix getCSRFullConceptsMatrix(int topklemms=5000,int lowestfreq = 2)
+        { 
             //индексы столбцы матрицы
             List<int> colIds = new List<int>();
             //номера начал строк 
@@ -215,24 +230,36 @@ namespace FunWithMemoryMappedFiles
                 
                 //указатель на начала строк
                 int rowPtr = 0;
+                int deflemmcnt = 0;
+                
+                //выбираем из fterms 5k самых частотных лемм                
+                var top5kfrequentlemms = _fterms.OrderByDescending(i => i.Value).Take(topklemms).Select(i =>i.Key).ToArray();               
+                HashSet<string> top5kfrequenthash = new HashSet<string>(top5kfrequentlemms);              
 
-
+                
 
                 foreach (string concept in GetDict.Keys)
                 {
                     rowPtrs.Add(rowPtr);
-
+                    deflemmcnt = 0;
                     foreach (var lemm in GetDict[concept].Keys)
                     {
-
-                        //if (_fterms[lemm] < lowestfreq) continue;
+                        
+                        if (_fterms[lemm] < lowestfreq) continue;
+                        if (!top5kfrequenthash.Contains(lemm)) continue;
                         //для каждой леммы концепта смотрим индекс в списке лемм словаря
                         colIds.Add(Lemms.IndexOf(lemm));
 
                         values.Add(GetDict[concept][lemm]);
+
+                        deflemmcnt++;
                     }
 
-                    rowPtr += GetDict[concept].Count;
+                    if (deflemmcnt == 0) continue;
+
+                    rowPtr += deflemmcnt;
+                    
+                    //rowPtr += GetDict[concept].Count;
 
 
                 } 

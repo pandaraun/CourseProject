@@ -3,3 +3,8 @@ C:\Users\pandarun\documents\visual studio 2010\Projects\FunWithMemoryMappedFiles
 C:\Users\pandarun\documents\visual studio 2010\Projects\FunWithMemoryMappedFiles\FunWithMemoryMappedFiles\obj\x86\Release\ResolveAssemblyReference.cache
 C:\Users\pandarun\documents\visual studio 2010\Projects\FunWithMemoryMappedFiles\FunWithMemoryMappedFiles\obj\x86\Release\FunWithMemoryMappedFiles.exe
 C:\Users\pandarun\documents\visual studio 2010\Projects\FunWithMemoryMappedFiles\FunWithMemoryMappedFiles\obj\x86\Release\FunWithMemoryMappedFiles.pdb
+C:\CourseProject\FunWithMemoryMappedFiles\bin\Release\KnnMutualKnn.exe
+C:\CourseProject\FunWithMemoryMappedFiles\bin\Release\KnnMutualKnn.pdb
+C:\CourseProject\FunWithMemoryMappedFiles\obj\x86\Release\ResolveAssemblyReference.cache
+C:\CourseProject\FunWithMemoryMappedFiles\obj\x86\Release\KnnMutualKnn.exe
+C:\CourseProject\FunWithMemoryMappedFiles\obj\x86\Release\KnnMutualKnn.pdb
